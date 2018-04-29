@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Contract UI</title>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet'>
+	<link href="main.css" rel="stylesheet">
+</head>
+
+<body>
+
+		
+
+	<div id="address"></div>
+	<div id="WinningProposal"></div>
+	<li><img src="images/chrome.png" alt="Chrome">Chrome Canary</li>
+	<div id="proposal1"></div>
+	<button onclick="voteForContract(0)">Vote</button>
+	<div></div> 
+	<li><img src="images/firefox.png" alt="Firefox">Firefox</li>
+	<div id="proposal2"></div>
+	<button onclick="voteForContract(1)">Vote</button>
+	<div></div>
+	<li><img src="images/safari.png" alt="Firefox">Firefox</li>
+	<div id="proposal3"></div>
+	<button onclick="voteForContract(2)">Vote</button>
+	
+	<script>
+		
+			var abi = [
+					{
+						"constant": true,
+						"inputs": [
+							{
+								"name": "",
+								"type": "uint256"
+							}
+						],
+						"name": "proposals",
+						"outputs": [
+							{
+								"name": "name",
+								"type": "bytes32"
+							},
+							{
+								"name": "voteCount",
+								"type": "uint256"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [],
+						"name": "name",
+						"outputs": [
+							{
+								"name": "",
+								"type": "string"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [],
+						"name": "totalVoteCount",
+						"outputs": [
+							{
+								"name": "",
+								"type": "uint256"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [
+							{
+								"name": "",
+								"type": "address"
+							}
+						],
+						"name": "voters",
+						"outputs": [
+							{
+								"name": "voted",
+								"type": "bool"
+							},
+							{
+								"name": "vote",
+								"type": "bytes32"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [],
+						"name": "website",
+						"outputs": [
+							{
+								"name": "",
+								"type": "string"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [],
+						"name": "logo",
+						"outputs": [
+							{
+								"name": "",
+								"type": "string"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"inputs": [
+							{
+								"name": "proposalsNames",
+								"type": "bytes32[]"
+							}
+						],
+						"payable": false,
+						"stateMutability": "nonpayable",
+						"type": "constructor"
+					},
+					{
+						"anonymous": false,
+						"inputs": [
+							{
+								"indexed": false,
+								"name": "voter",
+								"type": "address"
+							},
+							{
+								"indexed": false,
+								"name": "proposal",
+								"type": "bytes32"
+							}
+						],
+						"name": "Voted",
+						"type": "event"
+					},
+					{
+						"constant": true,
+						"inputs": [],
+						"name": "getProposals",
+						"outputs": [
+							{
+								"name": "",
+								"type": "bytes32[]"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": false,
+						"inputs": [
+							{
+								"name": "proposal",
+								"type": "bytes32"
+							}
+						],
+						"name": "vote",
+						"outputs": [],
+						"payable": false,
+						"stateMutability": "nonpayable",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [
+							{
+								"name": "voter",
+								"type": "address"
+							}
+						],
+						"name": "hasVoted",
+						"outputs": [
+							{
+								"name": "",
+								"type": "bool"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [
+							{
+								"name": "voter",
+								"type": "address"
+							}
+						],
+						"name": "getVote",
+						"outputs": [
+							{
+								"name": "",
+								"type": "bytes32"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [
+							{
+								"name": "proposal",
+								"type": "bytes32"
+							}
+						],
+						"name": "getProposalVoteCount",
+						"outputs": [
+							{
+								"name": "",
+								"type": "uint256"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					},
+					{
+						"constant": true,
+						"inputs": [],
+						"name": "getLeader",
+						"outputs": [
+							{
+								"name": "",
+								"type": "bytes32"
+							}
+						],
+						"payable": false,
+						"stateMutability": "view",
+						"type": "function"
+					}
+				];
+					
+			var propsal1_hex;
+			var propsal2_hex;
+			var propsal3_hex;
+			var rop_contract = web3.eth.contract(abi).at("0xabb563be895e3ba1d942dd58075ee8ac2c457aae");
+
+			window.addEventListener('load', function() {
+	
+			// Checking if Web3 has been injected by the browser (Mist/MetaMask)
+			//if (typeof web3 !== 'undefined') {
+	
+			  // Use the browser's ethereum provider
+	
+			//var account = web3.eth.accounts[0];
+			//	var accountInterval = setInterval(function () {
+			//		if (web3.eth.accounts[0] !== account) {
+			//			account = web3.eth.accounts[0];
+			//			document.getElementById("address").innerHTML = account;
+			//		}
+			//	}, 100);	
+	
+			//rop_contract.getLeader.call(function(error,data){
+			//	document.getElementById("WinningProposal").innerHTML = web3.toUtf8(data);
+			//})
+	
+			rop_contract.getProposals.call(function(error,data){
+				make_propsal_by_index (1,data[0]);
+				propsal1_hex = data[0];
+				make_propsal_by_index (2,data[1]);
+				propsal2_hex = data[1];
+				make_propsal_by_index (3,data[2]);
+				propsal3_hex = data[2];
+			})
+	
+			function make_propsal_by_index( proposal_number, proposal_ref ) {
+				
+				rop_contract.getProposalVoteCount.call(proposal_ref, function(error,data){
+					
+					document.getElementById("proposal" + proposal_number).innerHTML = '' + ' кол-во голосов = ' + data ;
+					
+					console.log('vote counter = ' + data );
+					
+				})
+			}
+
+			
+
+			//}
+			})	
+
+			function voteForContract( proposal_index ) {
+
+			var proposal_ref;	
+
+			if (proposal_index = 0) 
+				proposal_ref = propsal1_hex;
+			else if (proposal_index = 1) 
+				proposal_ref = propsal2_hex;
+			else if (proposal_index = 2) 
+				proposal_ref = propsal3_hex;
+
+
+			rop_contract.vote(proposal_ref, function(error,data){
+	
+			//return( data );
+			})
+			}		
+					
+		</script>
+</body>
