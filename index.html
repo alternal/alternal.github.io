@@ -22,9 +22,13 @@
 	<div id="proposal2"></div>
 	<button onclick="voteForContract(1)">Vote</button>
 	<div></div>
-	<li><img src="images/safari.png" alt="Firefox">Firefox</li>
+	<li><img src="images/safari.png" alt="Safari">Safari</li>
 	<div id="proposal3"></div>
 	<button onclick="voteForContract(2)">Vote</button>
+	<div></div>
+	<li><img src="images/ie.png" alt="InternetExplorer">InternetExplorer</li>
+	<div id="proposal4"></div>
+	<button onclick="voteForContract(3)">Vote</button>
 	
 	<script>
 		
@@ -263,6 +267,7 @@
 			var propsal1_hex;
 			var propsal2_hex;
 			var propsal3_hex;
+			var propsal4_hex;
 			var rop_contract = web3.eth.contract(abi).at("0xca5045191d8fc62787308456076104111b3b051f");
 
 			window.addEventListener('load', function() {
@@ -291,6 +296,9 @@
 				propsal2_hex = data[1];
 				make_propsal_by_index (3,data[2]);
 				propsal3_hex = data[2];
+				make_propsal_by_index (4,data[3]);
+				propsal4_hex = data[3];
+
 			})
 	
 			function make_propsal_by_index( proposal_number, proposal_ref ) {
@@ -319,6 +327,8 @@
 				proposal_ref = propsal2_hex;
 			else if (proposal_index = 2) 
 				proposal_ref = propsal3_hex;
+				else if (proposal_index = 3) 
+				proposal_ref = propsal4_hex;	
 
 
 			rop_contract.vote(proposal_ref, function(error,data){
